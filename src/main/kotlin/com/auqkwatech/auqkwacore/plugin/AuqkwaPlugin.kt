@@ -9,22 +9,23 @@ val auqkwaPlugins = hashSetOf<AuqkwaPlugin>()
 
 abstract class AuqkwaPlugin : JavaPlugin() {
 
-    val modsDirectory: File by lazy {
-        File(dataFolder.toPath(), "/mods")
+    val modsDirectory: java.io.File by lazy {
+        java.io.File(dataFolder, "/mods")
     }
 
     val myMods = hashMapOf<Mod, File>()
 
-    init {
-        Thread.currentThread().contextClassLoader = classLoader
-    }
-
     override fun onEnable() {
         super.onEnable()
+        Thread.currentThread().contextClassLoader = classLoader
         auqkwaPlugins.add(this)
     }
 
     abstract fun load(exists: Boolean)
+
+    fun loadMod(pair: Pair<Mod, File>) {
+        loadMod(pair.first, pair.second)
+    }
 
     fun loadMod(mod: Mod, file: File) {
         mod.start()
@@ -33,18 +34,17 @@ abstract class AuqkwaPlugin : JavaPlugin() {
 
     fun loadKotlinScript(
             scriptEngine: KotlinJsr223JvmLocalScriptEngine,
-            scriptName: String,
-            new: Boolean
+            scriptName: String
     ): Pair<Mod, File> {
         val fileContents: ByteArray
-        val file = File(modsDirectory, "${scriptName}.kts")
-        if (new) {
+        val file = File(modsDirectory.toPath(), "${scriptName}.kts")
+        if (file.exists) {
+            fileContents = file.readBytes()
+        } else {
             val resourceAsStream = classLoader.getResourceAsStream("mods/${scriptName}.kts")
             fileContents = ByteArray(resourceAsStream!!.available())
             resourceAsStream.read(fileContents)
             file.writeBytes(fileContents)
-        } else {
-            fileContents = file.readBytes()
         }
         val eval = scriptEngine.eval(String(fileContents), scriptEngine.context)
         if (eval !is Mod) {

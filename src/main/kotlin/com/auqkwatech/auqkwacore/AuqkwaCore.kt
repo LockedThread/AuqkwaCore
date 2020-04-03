@@ -17,21 +17,17 @@ class AuqkwaCore : AuqkwaPlugin() {
 
     companion object {
         var instance: AuqkwaCore? = null
-
-        init {
-            setIdeaIoUseFallback()
-        }
     }
 
     lateinit var gson: Gson
     lateinit var commandExecutor: CommandExecutor
-    private val scriptEngineManager: ScriptEngineManager = ScriptEngineManager()
+    lateinit var scriptEngineManager: ScriptEngineManager
     lateinit var scriptEngine: KotlinJsr223JvmLocalScriptEngine
 
     override fun onEnable() {
+        super.onEnable()
         instance = this
         saveDefaultConfig()
-
         this.gson = GsonBuilder()
                 .setPrettyPrinting()
                 .enableComplexMapKeySerialization()
@@ -39,11 +35,6 @@ class AuqkwaCore : AuqkwaPlugin() {
                 .registerTypeAdapter(ItemStack::class.java, ItemStackSerializer)
                 .create()
         this.commandExecutor = AuqkwaCommandExecutor()
-        val exists = modsDirectory.exists
-        if (!exists) {
-            modsDirectory.mkdirs()
-        }
-
         val pluginsFolder = dataFolder.parentFile
         val plugins = pluginsFolder.listFiles { pathname -> pathname.extension == "jar" } ?: emptyArray()
         info(plugins.contentToString())
@@ -60,13 +51,23 @@ class AuqkwaCore : AuqkwaPlugin() {
             info(classpath)
             System.setProperty("kotlin.script.classpath", classpath)
         }
+        Thread.currentThread().contextClassLoader = classLoader
+        setIdeaIoUseFallback()
+        scriptEngineManager = ScriptEngineManager(classLoader)
         scriptEngine = scriptEngineManager.getEngineByExtension("kts")!! as KotlinJsr223JvmLocalScriptEngine
-        load(exists)
+
+        if (!modsDirectory.exists()) {
+            modsDirectory.mkdirs()
+            load(true)
+        } else {
+            load(false)
+        }
     }
 
     override fun load(exists: Boolean) {
-        val pair = loadKotlinScript(scriptEngine, "Menus", !exists)
-        loadMod(pair.first, pair.second)
+        loadMod(loadKotlinScript(scriptEngine, "Menus"))
+        loadMod(loadKotlinScript(scriptEngine, "CoreCommands"))
+
     }
 
     /*private fun loadKotlinScript(

@@ -1,7 +1,9 @@
 package mods
 
+import com.auqkwatech.auqkwacore.AuqkwaCore
 import com.auqkwatech.auqkwacore.menus.Menu
 import com.auqkwatech.auqkwacore.mods.Mod
+import com.auqkwatech.auqkwacore.plugin.AuqkwaPlugin
 import com.auqkwatech.auqkwacore.utils.listen
 import org.bukkit.event.EventPriority
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -27,5 +29,6 @@ object : Mod {
     override fun name(): String = "Menus"
 
     override fun authors(): Array<String> = arrayOf("LockedThread")
+    override fun parent(): AuqkwaPlugin = AuqkwaCore.instance!!
 
 }

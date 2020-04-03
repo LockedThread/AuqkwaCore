@@ -4,18 +4,16 @@ import com.auqkwatech.auqkwacore.AuqkwaCore
 import com.auqkwatech.auqkwacore.plugin.AuqkwaPlugin
 import com.google.common.reflect.TypeToken
 import org.jetbrains.kotlin.konan.file.File
-import java.nio.file.Files
-import java.nio.file.Paths
 
 interface Config {
 
     fun fileName(): String
 
     fun loadConfig(auqkwaPlugin: AuqkwaPlugin): Any? {
-        val configFile = File(auqkwaPlugin.modsDirectory, fileName())
+        val configFile = java.io.File(auqkwaPlugin.modsDirectory, fileName())
         // Was created, didn't exist
-        if (configFile.exists) {
-            Files.createFile(Paths.get(configFile.path))
+        if (!configFile.exists()) {
+            configFile.createNewFile()
             saveConfig()
         } else {
             val fromJson = AuqkwaCore.instance!!.gson.fromJson<HashMap<String, Any>>(
@@ -32,7 +30,7 @@ interface Config {
     }
 
     fun saveConfig() {
-        val configFile = File(AuqkwaCore.instance!!.modsDirectory, fileName())
+        val configFile = File(AuqkwaCore.instance!!.modsDirectory.toPath(), fileName())
 
         val map = HashMap<String, Any>()
         this::class.java.declaredFields.forEach {
