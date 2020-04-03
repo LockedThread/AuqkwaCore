@@ -69,28 +69,6 @@ class AuqkwaCore : AuqkwaPlugin() {
 
     }
 
-    /*private fun loadKotlinScript(
-            directory: File,
-            scriptName: String,
-            new: Boolean
-    ): Mod {
-        val fileContents: ByteArray
-        val file = File(directory, "${scriptName}.kts")
-        if (new) {
-            val resourceAsStream = classLoader.getResourceAsStream("mods/${scriptName}.kts")
-            fileContents = ByteArray(resourceAsStream!!.available())
-            resourceAsStream.read(fileContents)
-            file.writeBytes(fileContents)
-        } else {
-            fileContents = file.readBytes()
-        }
-        val eval = receiver.eval(String(fileContents), receiver.context)
-        if (eval !is Mod) {
-            throw RuntimeException("Mod is null. File: ${file.path}")
-        }
-        return eval
-    }*/
-
     override fun onDisable() {
         instance = null
     }
