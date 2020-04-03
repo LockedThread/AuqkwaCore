@@ -3,7 +3,6 @@ package com.auqkwatech.auqkwacore.mods
 import com.auqkwatech.auqkwacore.commands.unregisterAllCommandsForMod
 import com.auqkwatech.auqkwacore.events.EventPost
 import com.auqkwatech.auqkwacore.plugin.AuqkwaPlugin
-import java.io.File
 
 val eventPostMap = HashMap<Mod, HashSet<EventPost<*>>>()
 
@@ -29,8 +28,6 @@ fun clearEventPosts(mod: Mod) {
         iterator.remove()
     }
 }
-
-val modToFile = HashMap<Mod, File>()
 
 interface Mod {
 

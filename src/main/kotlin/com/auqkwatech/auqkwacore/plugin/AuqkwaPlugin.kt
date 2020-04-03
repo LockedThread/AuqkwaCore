@@ -21,6 +21,11 @@ abstract class AuqkwaPlugin : JavaPlugin() {
         auqkwaPlugins.add(this)
     }
 
+    override fun onDisable() {
+        super.onDisable()
+        myMods.keys.forEach(Mod::stop)
+    }
+
     fun loadMod(pair: Pair<Mod, File>) {
         loadMod(pair.first, pair.second)
     }
