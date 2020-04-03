@@ -15,6 +15,19 @@ import java.util.Map;
 
 public class CommandMapUtil {
 
+    private static Field commandMap;
+    private static Constructor<PluginCommand> commandConstructor;
+
+    static {
+        try {
+            (commandMap = SimplePluginManager.class.getDeclaredField("commandMap")).setAccessible(true);
+
+            (commandConstructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class)).setAccessible(true);
+        } catch (NoSuchFieldException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void unregisterCommand(String s) {
         getCommandMap().getCommand(s).unregister(getCommandMap());
     }
@@ -34,33 +47,27 @@ public class CommandMapUtil {
     @SuppressWarnings("unchecked")
     private static Map<String, Command> getCommands() {
         try {
-            Field field = SimplePluginManager.class.getDeclaredField("commandMap");
-            field.setAccessible(true);
-            return (Map<String, org.bukkit.command.Command>) field.get(AuqkwaCore.Companion.getInstance().getServer().getPluginManager());
-        } catch (IllegalAccessException | NoSuchFieldException e) {
+            return (Map<String, org.bukkit.command.Command>) commandMap.get(AuqkwaCore.Companion.getInstance().getServer().getPluginManager());
+        } catch (IllegalAccessException e) {
             throw new RuntimeException("Unable to get the Bukkit KnowmCommand Map. Please contact Simpleness or LockedThread.", e);
         }
     }
 
     private static CommandMap getCommandMap() {
         try {
-            Field field = SimplePluginManager.class.getDeclaredField("commandMap");
-            field.setAccessible(true);
-            return (CommandMap) field.get(AuqkwaCore.Companion.getInstance().getServer().getPluginManager());
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            return (CommandMap) commandMap.get(AuqkwaCore.Companion.getInstance().getServer().getPluginManager());
+        } catch (SecurityException | IllegalArgumentException | IllegalAccessException e) {
             throw new RuntimeException("Unable to get the Bukkit CommandMap. Please contact Simpleness or LockedThread.", e);
         }
     }
 
     private static PluginCommand getPluginCommand(Plugin plugin, String... aliases) {
         try {
-            Constructor<PluginCommand> commandConstructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-            commandConstructor.setAccessible(true);
             PluginCommand pluginCommand = commandConstructor.newInstance(aliases[0], plugin);
             pluginCommand.setAliases(Arrays.asList(Arrays.copyOfRange(aliases, 1, aliases.length)));
             pluginCommand.setExecutor(AuqkwaCore.Companion.getInstance().commandExecutor);
             return pluginCommand;
-        } catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
+        } catch (SecurityException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             throw new RuntimeException("Unable to get PluginCommand. Please contact Simpleness or LockedThread.", e);
         }
     }
