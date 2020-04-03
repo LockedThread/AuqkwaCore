@@ -74,7 +74,7 @@ val shadowJar = tasks.named<ShadowJar>("shadowJar") {
         exclude(dependency("org.spigotmc:"))
         exclude(dependency("org.yaml:"))
     }
-    minimize()
+    //minimize()
 }
 
 artifacts {
