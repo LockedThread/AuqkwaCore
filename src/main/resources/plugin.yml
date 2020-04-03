@@ -1,0 +1,5 @@
+name: 'AuqkwaCore'
+main: 'com.auqkwatech.auqkwacore.AuqkwaCore'
+version: '1.0-SNAPSHOT'
+authors: ['LockedThread']
+description: "AuqkwaTech's Core Plugin"
