@@ -1,9 +1,9 @@
 package com.auqkwatech.auqkwacore.plugin
 
+import com.auqkwatech.auqkwacore.AuqkwaCore
 import com.auqkwatech.auqkwacore.mods.Mod
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.kotlin.konan.file.File
-import org.jetbrains.kotlin.script.jsr223.KotlinJsr223JvmLocalScriptEngine
 
 val auqkwaPlugins = hashSetOf<AuqkwaPlugin>()
 
@@ -21,8 +21,6 @@ abstract class AuqkwaPlugin : JavaPlugin() {
         auqkwaPlugins.add(this)
     }
 
-    abstract fun load(exists: Boolean)
-
     fun loadMod(pair: Pair<Mod, File>) {
         loadMod(pair.first, pair.second)
     }
@@ -32,10 +30,7 @@ abstract class AuqkwaPlugin : JavaPlugin() {
         myMods[mod] = file
     }
 
-    fun loadKotlinScript(
-            scriptEngine: KotlinJsr223JvmLocalScriptEngine,
-            scriptName: String
-    ): Pair<Mod, File> {
+    fun loadKotlinScript(scriptName: String): Pair<Mod, File> {
         val fileContents: ByteArray
         val file = File(modsDirectory.toPath(), "${scriptName}.kts")
         if (file.exists) {
@@ -46,7 +41,7 @@ abstract class AuqkwaPlugin : JavaPlugin() {
             resourceAsStream.read(fileContents)
             file.writeBytes(fileContents)
         }
-        val eval = scriptEngine.eval(String(fileContents), scriptEngine.context)
+        val eval = AuqkwaCore.instance!!.scriptEngine.eval(String(fileContents))
         if (eval !is Mod) {
             throw RuntimeException("Mod is null. File: ${file.path}")
         }

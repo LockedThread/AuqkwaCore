@@ -58,15 +58,14 @@ class AuqkwaCore : AuqkwaPlugin() {
 
         if (!modsDirectory.exists()) {
             modsDirectory.mkdirs()
-            load(true)
-        } else {
-            load(false)
         }
+        load()
+
     }
 
-    override fun load(exists: Boolean) {
-        loadMod(loadKotlinScript(scriptEngine, "Menus"))
-        loadMod(loadKotlinScript(scriptEngine, "CoreCommands"))
+    private fun load() {
+        loadMod(loadKotlinScript("Menus"))
+        loadMod(loadKotlinScript("CoreCommands"))
 
     }
 
