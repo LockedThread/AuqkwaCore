@@ -34,7 +34,7 @@ class EventPostExecutor<T : Event>(private val eventPost: EventPost<T>, private 
         }
         if (eventPost.hasFilters()) {
             for (filter in eventPost.filters) {
-                if (!filter.invoke(event as T)) {
+                if (!filter(event as T)) {
                     return
                 }
             }

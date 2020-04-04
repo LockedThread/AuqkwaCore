@@ -41,7 +41,7 @@ fun unregisterAllCommandsForMod(mod: Mod) {
 }
 
 @Suppress("RemoveExplicitTypeArguments")
-abstract class Command(vararg val aliases: String) {
+class Command(vararg val aliases: String) {
 
     companion object {
 
@@ -62,6 +62,7 @@ abstract class Command(vararg val aliases: String) {
     var description: String? = null
     var helpTitle: String? = null
 
+    private var executionConsumer: ((CommandContext) -> Unit) = {}
     private var commandImplications: EnumSet<CommandImplication>? = null
 
     private val subCommands: HashMap<String, Command> by lazy {
@@ -76,8 +77,9 @@ abstract class Command(vararg val aliases: String) {
         LinkedHashMap<String, String>()
     }
 
-    @Throws(CommandParseException::class)
-    abstract fun execute(context: CommandContext)
+    fun withExecution(lambda: (CommandContext) -> Unit) {
+        this.executionConsumer = lambda
+    }
 
     @Throws(CommandParseException::class)
     fun perform(context: CommandContext) {
@@ -93,7 +95,7 @@ abstract class Command(vararg val aliases: String) {
                 subCommands[context.label]!!.perform(context)
             } else {
                 if (validCommandImplcations(context)) {
-                    execute(context)
+                    executionConsumer(context)
                 }
             }
         } else {

@@ -14,8 +14,8 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     mavenLocal()
-    //maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://papermc.io/repo/repository/maven-public/")
+    maven("https://jitpack.io")
     jcenter()
 }
 
@@ -38,6 +38,9 @@ dependencies {
     /* FastUtil */
     implementation("it.unimi.dsi", "fastutil", "8.3.1")
     implementation("commons-io", "commons-io", "2.6")
+
+    /* Watch Service API */
+    compile("com.github.vishna", "watchservice-ktx", "master-SNAPSHOT")
 
     testCompile("junit", "junit", "4.12")
 }

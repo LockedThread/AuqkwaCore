@@ -8,7 +8,15 @@ import org.bukkit.event.EventPriority
 import java.util.LinkedList
 import kotlin.reflect.KClass
 
-class EventPost<T : Event>(val clazz: KClass<T>, val eventPriority: EventPriority) {
+class EventPost<T : Event>() {
+
+    constructor(clazz: KClass<T>, eventPriority: EventPriority) : this() {
+        this.clazz = clazz
+        this.eventPriority = eventPriority
+    }
+
+    lateinit var clazz: KClass<T>
+    lateinit var eventPriority: EventPriority
 
     var disabled = false
     val filters: LinkedList<(T) -> Boolean> by lazy {
@@ -25,8 +33,9 @@ class EventPost<T : Event>(val clazz: KClass<T>, val eventPriority: EventPriorit
         return this
     }
 
-    fun handle(event: (T) -> Unit, mod: Mod?) {
+    fun handle(event: (T) -> Unit, mod: Mod?): EventPost<T> {
         this.listenerConsumer = event
         EventPostExecutor(this, mod).registerListener()
+        return this
     }
 }
