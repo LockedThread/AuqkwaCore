@@ -14,13 +14,17 @@ mod {
 
     withCommands {
         with {
-            this.permission = "auqkwacore.viewmods"
-            this.description = "displays all of the mods"
-            withExecution {
-                val nigger = TextComponent.builder().color(TextColor.GREEN).append("Mods: ")
+            permission {
+                "auqkwacore.viewmods"
+            }
+            description {
+                "displays all of the mods"
+            }
+            execution {
+                val parentMessage = TextComponent.builder().color(TextColor.GREEN).append("Mods: ")
                 val mods = parent!!.myMods
                 for ((index, entry) in mods.entries.withIndex()) {
-                    nigger.append(entry.key.name + if (index == mods.size - 1) "" else ", ").hoverEvent(HoverEvent.of(
+                    parentMessage.append(entry.key.name + if (index == mods.size - 1) "" else ", ").hoverEvent(HoverEvent.of(
                             HoverEvent.Action.SHOW_TEXT,
                             TextComponent.builder()
                                     .append("Plugin: ").append("${entry.key.parent!!.name}\n")
@@ -29,7 +33,7 @@ mod {
                                     .build()
                     ))
                 }
-                it.sendMessage(nigger.build())
+                it.sendMessage(parentMessage.build())
             }
         }
     }

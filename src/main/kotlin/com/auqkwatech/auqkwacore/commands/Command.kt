@@ -10,8 +10,6 @@ import com.auqkwatech.auqkwacore.utils.implode
 import com.auqkwatech.auqkwacore.utils.info
 import com.auqkwatech.auqkwacore.utils.isLazyInitialized
 import com.auqkwatech.auqkwacore.utils.sendCenteredMessage
-import com.google.common.collect.Multimap
-import com.google.common.collect.MultimapBuilder
 import net.kyori.text.TextComponent
 import net.kyori.text.format.TextColor
 import net.kyori.text.format.TextDecoration
@@ -25,19 +23,12 @@ fun registerCommand(command: Command, mod: Mod) {
     for (alias in command.aliases) {
         Command.COMMAND_MAP[alias] = command
     }
-    Command.MOD_COMMANDS[mod].add(command)
-
     CommandMapUtil.registerCommand(AuqkwaCore.instance, command.aliases)
 }
 
-fun unregisterCommand(command: Command, mod: Mod) {
+fun unregisterCommand(command: Command) {
     command.aliases.forEach { Command.COMMAND_MAP.remove(it) }
     CommandMapUtil.unregisterCommand(command.aliases[0])
-    Command.MOD_COMMANDS[mod].remove(command)
-}
-
-fun unregisterAllCommandsForMod(mod: Mod) {
-    Command.MOD_COMMANDS[mod].forEach { unregisterCommand(it, mod) }
 }
 
 @Suppress("RemoveExplicitTypeArguments")
@@ -46,7 +37,6 @@ class Command(vararg val aliases: String) {
     companion object {
 
         @Suppress("UnstableApiUsage")
-        val MOD_COMMANDS: Multimap<Mod, Command> = MultimapBuilder.hashKeys().hashSetValues().build()
         val COMMAND_MAP: HashMap<String, Command> = HashMap()
 
         val WHITE_LINE = TextComponent.builder().color(TextColor.WHITE)
@@ -77,8 +67,20 @@ class Command(vararg val aliases: String) {
         LinkedHashMap<String, String>()
     }
 
-    fun withExecution(lambda: (CommandContext) -> Unit) {
+    fun execution(lambda: (CommandContext) -> Unit) {
         this.executionConsumer = lambda
+    }
+
+    fun permission(lambda: () -> String) {
+        this.permission = lambda()
+    }
+
+    fun description(lambda: () -> String) {
+        this.description = lambda()
+    }
+
+    fun helpTitle(lambda: () -> String) {
+        this.helpTitle = lambda()
     }
 
     @Throws(CommandParseException::class)

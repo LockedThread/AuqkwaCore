@@ -33,9 +33,13 @@ class EventPost<T : Event>() {
         return this
     }
 
-    fun handle(event: (T) -> Unit, mod: Mod?): EventPost<T> {
+    fun handle(mod: Mod?, event: (T) -> Unit): EventPost<T> {
         this.listenerConsumer = event
         EventPostExecutor(this, mod).registerListener()
         return this
+    }
+
+    fun priority(lambda: () -> EventPriority) {
+        this.eventPriority = lambda()
     }
 }

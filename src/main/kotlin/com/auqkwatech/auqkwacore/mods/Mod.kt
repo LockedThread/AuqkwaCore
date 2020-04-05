@@ -2,35 +2,10 @@ package com.auqkwatech.auqkwacore.mods
 
 import com.auqkwatech.auqkwacore.commands.Command
 import com.auqkwatech.auqkwacore.commands.registerCommand
-import com.auqkwatech.auqkwacore.commands.unregisterAllCommandsForMod
+import com.auqkwatech.auqkwacore.commands.unregisterCommand
 import com.auqkwatech.auqkwacore.events.EventPost
 import com.auqkwatech.auqkwacore.plugin.AuqkwaPlugin
 import org.bukkit.event.Event
-
-val eventPostMap = HashMap<Mod, HashSet<EventPost<*>>>()
-
-fun addEventPost(mod: Mod, eventPost: EventPost<*>) {
-    eventPostMap.computeIfPresent(mod) { _, shit ->
-        shit.add(eventPost)
-        shit
-    }
-    eventPostMap.putIfAbsent(mod, hashSetOf(eventPost))
-}
-
-fun removeEventPost(mod: Mod, eventPost: EventPost<*>) {
-    eventPostMap.computeIfPresent(mod) { _, shit ->
-        shit.remove(eventPost)
-        shit
-    }
-}
-
-fun clearEventPosts(mod: Mod) {
-    val iterator = eventPostMap[mod]?.iterator()!!
-    while (iterator.hasNext()) {
-        iterator.next().disabled = true
-        iterator.remove()
-    }
-}
 
 fun mod(lambda: Mod.() -> Unit): Mod {
     val mod = Mod()
@@ -82,8 +57,8 @@ class Mod {
     }
 
     fun stop() {
-        clearEventPosts(this)
-        unregisterAllCommandsForMod(this)
+        eventPosts?.clear()
+        commands?.clear()
         stopLambda()
     }
 
@@ -99,10 +74,20 @@ class Commands : ArrayList<Command>() {
     fun with(command: Command.() -> Unit) {
         add(BLANK_COMMAND.apply(command))
     }
+
+    override fun clear() {
+        forEach { unregisterCommand(it) }
+        super.clear()
+    }
 }
 
 class EventPosts : ArrayList<EventPost<*>>() {
     inline fun <T : Event> with(command: EventPost<T>.() -> Unit) {
         add(EventPost<T>().apply(command))
+    }
+
+    override fun clear() {
+        forEach { it.disabled = true }
+        super.clear()
     }
 }
