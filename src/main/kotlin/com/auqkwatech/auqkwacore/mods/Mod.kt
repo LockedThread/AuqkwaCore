@@ -21,8 +21,8 @@ class Mod {
     internal var name: String = ""
     internal var authors: Array<String> = emptyArray()
     internal var parent: AuqkwaPlugin? = null
-    private var commands: Commands? = null
-    private var eventPosts: EventPosts? = null
+    var commands: Commands? = null
+    var eventPosts: EventPosts? = null
 
     fun onStart(lambda: () -> Unit) {
         this.startLambda = lambda
@@ -81,9 +81,12 @@ class Commands : ArrayList<Command>() {
     }
 }
 
+val BLANK_EVENTPOST = EventPost<Event>()
+
 class EventPosts : ArrayList<EventPost<*>>() {
-    inline fun <T : Event> with(command: EventPost<T>.() -> Unit) {
-        add(EventPost<T>().apply(command))
+    @Suppress("UNCHECKED_CAST")
+    inline fun <T : Event> with(eventPost: EventPost<T>.() -> Unit) {
+        add((BLANK_EVENTPOST as EventPost<T>).apply(eventPost))
     }
 
     override fun clear() {
