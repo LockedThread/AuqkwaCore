@@ -20,7 +20,7 @@ mod {
             priority { EventPriority.HIGHEST }
             filter { it.clickedInventory != null && it.clickedInventory!!.holder is Menu }
             handle(this@mod) {
-                (it.clickedInventory!!.holder as Menu).getItemClickCallback(it.rawSlot)!!(it)
+                (it.clickedInventory!!.holder as Menu).getItemClickLambda(it.rawSlot)!!(it)
             }
         }
         with<InventoryCloseEvent> {
