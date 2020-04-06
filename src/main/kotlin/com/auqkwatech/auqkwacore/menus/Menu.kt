@@ -10,7 +10,13 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 
-abstract class Menu(val name: String, size: Int) : InventoryHolder {
+fun menu(lambda: Menu.() -> Unit, name: String, size: Int): Menu {
+    val mod = Menu(name, size)
+    lambda(mod)
+    return mod
+}
+
+class Menu(name: String, size: Int) : InventoryHolder {
 
     companion object {
         val SET_CANCELLED: (InventoryClickEvent) -> Unit = { it.isCancelled = true }
@@ -18,12 +24,19 @@ abstract class Menu(val name: String, size: Int) : InventoryHolder {
 
     var inventoryOpen: ((InventoryOpenEvent) -> Unit)? = null
     var inventoryClose: ((InventoryCloseEvent) -> Unit)? = null
+    private var initialize: () -> Unit = {}
     private val itemClickCallbacks = Int2ObjectOpenHashMap<(InventoryClickEvent) -> Unit>()
-
-    //TODO: Figure out why I get the warning below
     private val inventory: Inventory = server.createInventory(this, size, color(name))
 
-    final override fun getInventory(): Inventory = inventory
+    init {
+        initialize()
+    }
+
+    fun onInitialize(lambda: () -> Unit) {
+        this.initialize = lambda
+    }
+
+    override fun getInventory(): Inventory = inventory
 
     fun setItem(slot: Int, itemStack: ItemStack) {
         setItem(slot, itemStack, null)
@@ -34,7 +47,7 @@ abstract class Menu(val name: String, size: Int) : InventoryHolder {
         itemClickCallbacks[slot] = event ?: SET_CANCELLED
     }
 
-    fun getItemClickCallback(slot: Int): ((InventoryClickEvent) -> Unit)? {
+    fun getItemClickLambda(slot: Int): ((InventoryClickEvent) -> Unit)? {
         return itemClickCallbacks[slot]
     }
 
