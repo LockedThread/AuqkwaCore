@@ -33,6 +33,6 @@ class EventPostExecutor<T : Event>(private val eventPost: EventPost<T>, private 
                 }
             }
         }
-        eventPost.listenerConsumer!!.invoke(event as T)
+        eventPost.listenerConsumer!!(event as T)
     }
 }
